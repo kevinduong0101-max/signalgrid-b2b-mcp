@@ -22,7 +22,7 @@ const __dirname = path.dirname(__filename);
 const SAMPLES_DIR = path.resolve(__dirname, '..', 'samples');
 
 interface SampleCatalogEntry {
-    key: 'xero' | 'quickbooks' | 'fda';
+    key: 'xero' | 'quickbooks' | 'zoho' | 'fda';
     uri: string;
     name: string;
     filename: string;
@@ -45,6 +45,14 @@ const SAMPLE_CATALOG: readonly SampleCatalogEntry[] = [
         filename: 'quickbooks-apps-sample-50.csv',
         description:
             '50 verified QuickBooks App Store vendor records with supportEmail, supportPhone, pricing plans, Intuit AQI badges, and churn signals.',
+    },
+    {
+        key: 'zoho',
+        uri: 'signalgrid://samples/zoho-apps-50',
+        name: 'Zoho Marketplace B2B Vendor Leads, Street Addresses & Churn Sample (50 rows)',
+        filename: 'zoho-apps-sample-50.csv',
+        description:
+            '50 verified Zoho Marketplace B2B SaaS vendor records with supportEmail, companyEmail, phone, full office street address, and churn signals.',
     },
     {
         key: 'fda',
@@ -338,9 +346,52 @@ export function createSignalGridMcpServer(): Server {
                 },
             },
             {
+                name: 'extract_zoho_b2b_leads_and_churn',
+                description:
+                    'Extract live Zoho Marketplace B2B SaaS vendor leads, direct support & company emails, phone numbers, verified partner street addresses, pricing models, and 1-3 star churn reviews across Zoho CRM, Books, Desk & Inventory (signalgridhq/zoho-marketplace-scraper).',
+                annotations: {
+                    title: 'Extract Zoho Marketplace B2B Vendor Leads & Churn Reviews',
+                    readOnlyHint: true,
+                    destructiveHint: false,
+                    idempotentHint: true,
+                    openWorldHint: true,
+                },
+                inputSchema: {
+                    type: 'object',
+                    additionalProperties: false,
+                    properties: {
+                        mode: {
+                            type: 'string',
+                            enum: ['apps', 'churn_reviews', 'apps_with_churn'],
+                            default: 'apps_with_churn',
+                            description:
+                                "Extraction mode: 'apps' for vendor contacts & street addresses, 'churn_reviews' for 1-3 star reviews, or 'apps_with_churn' for both.",
+                        },
+                        products: {
+                            type: 'array',
+                            items: { type: 'string' },
+                            default: ['books', 'crm'],
+                            description:
+                                "Zoho product marketplaces to crawl (e.g. ['books', 'crm', 'desk', 'inventory', 'billing', 'recruit']).",
+                        },
+                        searchQuery: {
+                            type: 'string',
+                            description: "Optional keyword filter (e.g. 'stripe', 'whatsapp', 'shopify').",
+                        },
+                        maxItems: {
+                            type: 'integer',
+                            minimum: 1,
+                            maximum: 200,
+                            default: 15,
+                            description: 'Maximum dataset items to return in this MCP call (1-200).',
+                        },
+                    },
+                },
+            },
+            {
                 name: 'preview_sample_b2b_dataset',
                 description:
-                    'Read verified offline sample rows (up to 50 records) from the bundled Xero App Store, QuickBooks App Store, or US FDA Import Refusal datasets with zero API key required.',
+                    'Read verified offline sample rows (up to 50 records) from the bundled Xero App Store, QuickBooks App Store, Zoho Marketplace, or US FDA Import Refusal datasets with zero API key required.',
                 annotations: {
                     title: 'Preview Offline B2B Sample Dataset (No API Key Needed)',
                     readOnlyHint: true,
@@ -355,8 +406,9 @@ export function createSignalGridMcpServer(): Server {
                     properties: {
                         dataset: {
                             type: 'string',
-                            enum: ['xero', 'quickbooks', 'fda'],
-                            description: "Which bundled B2B dataset to preview: 'xero', 'quickbooks', or 'fda'.",
+                            enum: ['xero', 'quickbooks', 'zoho', 'fda'],
+                            description:
+                                "Which bundled B2B dataset to preview: 'xero', 'quickbooks', 'zoho', or 'fda'.",
                         },
                         limit: {
                             type: 'integer',
@@ -451,6 +503,21 @@ export function createSignalGridMcpServer(): Server {
                     payload.searchQuery = args.searchQuery.trim();
                 }
                 const items = await runApifyActor('quickbooks-app-marketplace-scraper', payload);
+                return {
+                    content: [{ type: 'text', text: JSON.stringify(items, null, 2) }],
+                };
+            }
+
+            if (name === 'extract_zoho_b2b_leads_and_churn') {
+                const payload: Record<string, unknown> = {
+                    mode: typeof args.mode === 'string' ? args.mode : 'apps_with_churn',
+                    products: Array.isArray(args.products) ? args.products : ['books', 'crm'],
+                    maxItems: clampMaxItems(args.maxItems, 15),
+                };
+                if (typeof args.searchQuery === 'string' && args.searchQuery.trim().length > 0) {
+                    payload.searchQuery = args.searchQuery.trim();
+                }
+                const items = await runApifyActor('zoho-marketplace-scraper', payload);
                 return {
                     content: [{ type: 'text', text: JSON.stringify(items, null, 2) }],
                 };
