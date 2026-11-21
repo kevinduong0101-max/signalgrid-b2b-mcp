@@ -1,30 +1,85 @@
-# SignalGrid B2B Intelligence — MCP Server & Open Sample Datasets
+# SignalGrid B2B Intelligence — Open-Source MCP Server (`signalgrid-b2b-mcp`)
 
-Production-grade **Model Context Protocol (MCP)** connector configuration and 50-row sample datasets for **B2B SaaS Churn Intelligence** (Xero App Store, QuickBooks App Store) and **U.S. Customs / FDA Port Detention Leads**.
+Open-source **Model Context Protocol (MCP)** TypeScript server (`@modelcontextprotocol/sdk`) connecting **Claude Desktop**, **Cursor**, **Windsurf**, **Cline**, and MCP clients to pure-HTTP B2B SaaS churn intelligence and US customs port detention datasets powered by [`signalgridhq`](https://apify.com/signalgridhq).
 
-- **Apify Store Publisher:** [https://apify.com/signalgridhq](https://apify.com/signalgridhq)
-- **Engineering Benchmarks:** [https://dev.to/signalgridhq](https://dev.to/signalgridhq)
-
----
-
-## Live Pure-HTTP Extractors (~100MB RAM, Pay-Per-Event)
-
-| Tool / Actor | Target Ecosystem | Sample CSV (50 Rows) | Live Apify Store Extractor |
-| :--- | :--- | :--- | :--- |
-| **Xero App Store B2B Leads & Churn** | `apps.xero.com` (570+ apps) | [`samples/xero-apps-sample-50.csv`](./samples/xero-apps-sample-50.csv) | [signalgridhq/xero-app-marketplace-scraper](https://apify.com/signalgridhq/xero-app-marketplace-scraper) |
-| **QuickBooks App Store B2B Leads & Churn** | `apps.intuit.com` (6,400+ apps) | [`samples/quickbooks-apps-sample-50.csv`](./samples/quickbooks-apps-sample-50.csv) | [signalgridhq/quickbooks-app-marketplace-scraper](https://apify.com/signalgridhq/quickbooks-app-marketplace-scraper) |
-| **US FDA Import Refusal & Port Detention Leads** | `accessdata.fda.gov` (OASIS IRR) | [`samples/fda-import-refusals-sample-50.csv`](./samples/fda-import-refusals-sample-50.csv) | [signalgridhq/fda-import-refusal-leads](https://apify.com/signalgridhq/fda-import-refusal-leads) |
+<a href="https://glama.ai/mcp/servers/@kevinduong0101-max/signalgrid-b2b-mcp">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/@kevinduong0101-max/signalgrid-b2b-mcp/badge" alt="signalgrid-b2b-mcp MCP server" />
+</a>
 
 ---
 
-## Connect to Claude Desktop, Cursor & Windsurf via MCP
+## Features & Included MCP Primitives
 
-Add the remote streamable HTTP MCP endpoint to `.mcp.json` or `claude_desktop_config.json`:
+### Tools (`tools/list`)
+1. **`extract_xero_b2b_leads_and_churn`** — Extracts 570+ Xero App Store B2B vendor leads, partner websites, 1–5 star histograms, and 1–3 star churning user reviews via [`signalgridhq/xero-app-marketplace-scraper`](https://apify.com/signalgridhq/xero-app-marketplace-scraper).
+2. **`extract_quickbooks_b2b_leads_and_churn`** — Extracts 660+ US / 6,400+ global QuickBooks App Store vendor contacts (`supportEmail`, `supportPhone`, partner website), pricing tiers, Intuit AQI quality badges, and 1–3 star churn reviews via [`signalgridhq/quickbooks-app-marketplace-scraper`](https://apify.com/signalgridhq/quickbooks-app-marketplace-scraper).
+3. **`extract_fda_port_refusal_leads`** — Extracts official US FDA OASIS port detention & import refusal shipments with foreign manufacturer FEI, street address, private-lab gap flag, and FD&C Act violation charges via [`signalgridhq/fda-import-refusal-leads`](https://apify.com/signalgridhq/fda-import-refusal-leads).
+4. **`preview_sample_b2b_dataset`** — Reads up to 50 verified sample records (`xero`, `quickbooks`, or `fda`) locally from `samples/*.csv` **offline with zero API key required**.
+
+### Resources (`resources/list`)
+- `signalgrid://samples/xero-apps-50` → [`samples/xero-apps-sample-50.csv`](./samples/xero-apps-sample-50.csv)
+- `signalgrid://samples/quickbooks-apps-50` → [`samples/quickbooks-apps-sample-50.csv`](./samples/quickbooks-apps-sample-50.csv)
+- `signalgrid://samples/fda-import-refusals-50` → [`samples/fda-import-refusals-sample-50.csv`](./samples/fda-import-refusals-sample-50.csv)
+
+### Prompts (`prompts/list`)
+- `find-competitor-churn-leads` — Cross-marketplace Xero vs QuickBooks 1–3 star churn comparison workflow.
+- `triage-fda-detained-shipments` — Foreign exporter compliance outreach workflow filtering shipments without private lab analysis.
+
+---
+
+## Quickstart: Self-Hosted `stdio` Server (Node.js or Docker)
+
+### Option A: Build & Run from Source (Node.js >= 20)
+
+```bash
+git clone https://github.com/kevinduong0101-max/signalgrid-b2b-mcp.git
+cd signalgrid-b2b-mcp
+npm install
+npm run build
+```
+
+Add to `claude_desktop_config.json` or `.cursor/mcp.json`:
 
 ```json
 {
   "mcpServers": {
     "signalgrid-b2b": {
+      "command": "node",
+      "args": ["/ABSOLUTE/PATH/TO/signalgrid-b2b-mcp/dist/index.js"],
+      "env": {
+        "APIFY_API_TOKEN": "YOUR_APIFY_API_TOKEN"
+      }
+    }
+  }
+}
+```
+
+### Option B: Run via Docker
+
+```bash
+docker build -t signalgrid-b2b-mcp .
+```
+
+```json
+{
+  "mcpServers": {
+    "signalgrid-b2b": {
+      "command": "docker",
+      "args": ["run", "-i", "--rm", "-e", "APIFY_API_TOKEN", "signalgrid-b2b-mcp"],
+      "env": {
+        "APIFY_API_TOKEN": "YOUR_APIFY_API_TOKEN"
+      }
+    }
+  }
+}
+```
+
+### Option C: Zero-Install Remote Streamable HTTP Connector
+
+```json
+{
+  "mcpServers": {
+    "signalgrid-b2b-remote": {
       "type": "http",
       "url": "https://mcp.apify.com/?tools=signalgridhq/xero-app-marketplace-scraper,signalgridhq/quickbooks-app-marketplace-scraper,signalgridhq/fda-import-refusal-leads",
       "headers": {
@@ -35,6 +90,16 @@ Add the remote streamable HTTP MCP endpoint to `.mcp.json` or `claude_desktop_co
 }
 ```
 
+---
+
+## Environment Variables
+
+| Variable | Required | Description |
+| :--- | :---: | :--- |
+| `APIFY_API_TOKEN` | Optional for startup / sample preview; Required for live extraction | Your Apify API token ([free `$5/month` starter credit](https://console.apify.com/settings/integrations)). Server boots, lists tools/resources/prompts, and serves `preview_sample_b2b_dataset` without a token. |
+
+---
+
 ## License
 
-MIT
+MIT — see [LICENSE](./LICENSE).
