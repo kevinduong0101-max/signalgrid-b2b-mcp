@@ -1,6 +1,6 @@
 # SignalGrid B2B Intelligence — Open-Source MCP Server (`signalgrid-b2b-mcp`)
 
-Open-source **Model Context Protocol (MCP)** TypeScript server (`@modelcontextprotocol/sdk`) connecting **Claude Desktop**, **Cursor**, **Windsurf**, **Cline**, and MCP clients to pure-HTTP B2B SaaS churn intelligence and US customs port detention datasets powered by [`signalgridhq`](https://apify.com/signalgridhq).
+Open-source **Model Context Protocol (MCP)** TypeScript server (`@modelcontextprotocol/sdk`) connecting **Claude Desktop**, **Cursor**, **Windsurf**, **Cline**, and MCP clients to pure-HTTP B2B SaaS/ERP churn intelligence and US customs port detention datasets powered by [`signalgridhq`](https://apify.com/signalgridhq).
 
 <a href="https://glama.ai/mcp/servers/@kevinduong0101-max/signalgrid-b2b-mcp">
   <img width="380" height="200" src="https://glama.ai/mcp/servers/@kevinduong0101-max/signalgrid-b2b-mcp/badge" alt="signalgrid-b2b-mcp MCP server" />
@@ -10,15 +10,19 @@ Open-source **Model Context Protocol (MCP)** TypeScript server (`@modelcontextpr
 
 ## Features & Included MCP Primitives
 
-### Tools (`tools/list`)
+### Tools (`tools/list` — 6 Tools)
 1. **`extract_xero_b2b_leads_and_churn`** — Extracts 570+ Xero App Store B2B vendor leads, partner websites, 1–5 star histograms, and 1–3 star churning user reviews via [`signalgridhq/xero-app-marketplace-scraper`](https://apify.com/signalgridhq/xero-app-marketplace-scraper).
 2. **`extract_quickbooks_b2b_leads_and_churn`** — Extracts 660+ US / 6,400+ global QuickBooks App Store vendor contacts (`supportEmail`, `supportPhone`, partner website), pricing tiers, Intuit AQI quality badges, and 1–3 star churn reviews via [`signalgridhq/quickbooks-app-marketplace-scraper`](https://apify.com/signalgridhq/quickbooks-app-marketplace-scraper).
-3. **`extract_fda_port_refusal_leads`** — Extracts official US FDA OASIS port detention & import refusal shipments with foreign manufacturer FEI, street address, private-lab gap flag, and FD&C Act violation charges via [`signalgridhq/fda-import-refusal-leads`](https://apify.com/signalgridhq/fda-import-refusal-leads).
-4. **`preview_sample_b2b_dataset`** — Reads up to 50 verified sample records (`xero`, `quickbooks`, or `fda`) locally from `samples/*.csv` **offline with zero API key required**.
+3. **`extract_zoho_b2b_leads_and_churn`** — Extracts 2,500+ Zoho Marketplace B2B SaaS vendor leads, direct `supportEmail` / `companyEmail`, phone numbers, verified partner street addresses, and 1–3 star churn reviews across Zoho CRM, Books, Desk & Inventory via [`signalgridhq/zoho-marketplace-scraper`](https://apify.com/signalgridhq/zoho-marketplace-scraper).
+4. **`extract_netsuite_b2b_leads_and_churn`** — Extracts 720+ Oracle NetSuite SuiteApp ERP B2B vendor leads, Built-for-NetSuite verification badges, `SuiteScript 2.x` / `SuiteTalk REST` integration stacks, verticals, and 1–3 star ERP implementation churn reviews via [`signalgridhq/netsuite-suiteapp-directory-scraper`](https://apify.com/signalgridhq/netsuite-suiteapp-directory-scraper).
+5. **`extract_fda_port_refusal_leads`** — Extracts official US FDA OASIS port detention & import refusal shipments with foreign manufacturer FEI, street address, private-lab gap flag, and FD&C Act violation charges via [`signalgridhq/fda-import-refusal-leads`](https://apify.com/signalgridhq/fda-import-refusal-leads).
+6. **`preview_sample_b2b_dataset`** — Reads up to 50 verified sample records (`xero`, `quickbooks`, `zoho`, `netsuite`, or `fda`) locally from `samples/*.csv` **offline with zero API key required**.
 
-### Resources (`resources/list`)
+### Resources (`resources/list` — 5 Bundled 50-Row Sample Datasets)
 - `signalgrid://samples/xero-apps-50` → [`samples/xero-apps-sample-50.csv`](./samples/xero-apps-sample-50.csv)
 - `signalgrid://samples/quickbooks-apps-50` → [`samples/quickbooks-apps-sample-50.csv`](./samples/quickbooks-apps-sample-50.csv)
+- `signalgrid://samples/zoho-apps-50` → [`samples/zoho-apps-sample-50.csv`](./samples/zoho-apps-sample-50.csv)
+- `signalgrid://samples/netsuite-apps-50` → [`samples/netsuite-apps-sample-50.csv`](./samples/netsuite-apps-sample-50.csv)
 - `signalgrid://samples/fda-import-refusals-50` → [`samples/fda-import-refusals-sample-50.csv`](./samples/fda-import-refusals-sample-50.csv)
 
 ### Prompts (`prompts/list`)
@@ -81,7 +85,7 @@ docker build -t signalgrid-b2b-mcp .
   "mcpServers": {
     "signalgrid-b2b-remote": {
       "type": "http",
-      "url": "https://mcp.apify.com/?tools=signalgridhq/xero-app-marketplace-scraper,signalgridhq/quickbooks-app-marketplace-scraper,signalgridhq/fda-import-refusal-leads",
+      "url": "https://mcp.apify.com/?tools=signalgridhq/xero-app-marketplace-scraper,signalgridhq/quickbooks-app-marketplace-scraper,signalgridhq/zoho-marketplace-scraper,signalgridhq/netsuite-suiteapp-directory-scraper,signalgridhq/fda-import-refusal-leads",
       "headers": {
         "Authorization": "Bearer YOUR_APIFY_API_TOKEN"
       }
