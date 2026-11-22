@@ -22,7 +22,7 @@ const __dirname = path.dirname(__filename);
 const SAMPLES_DIR = path.resolve(__dirname, '..', 'samples');
 
 interface SampleCatalogEntry {
-    key: 'xero' | 'quickbooks' | 'zoho' | 'fda';
+    key: 'xero' | 'quickbooks' | 'zoho' | 'netsuite' | 'fda';
     uri: string;
     name: string;
     filename: string;
@@ -53,6 +53,14 @@ const SAMPLE_CATALOG: readonly SampleCatalogEntry[] = [
         filename: 'zoho-apps-sample-50.csv',
         description:
             '50 verified Zoho Marketplace B2B SaaS vendor records with supportEmail, companyEmail, phone, full office street address, and churn signals.',
+    },
+    {
+        key: 'netsuite',
+        uri: 'signalgrid://samples/netsuite-apps-50',
+        name: 'NetSuite SuiteApp ERP Directory Leads & Tech Stack Sample (50 rows)',
+        filename: 'netsuite-apps-sample-50.csv',
+        description:
+            '50 verified Oracle NetSuite SuiteApp ERP vendor records with Built-for-NetSuite badges, SuiteScript/SuiteTalk integration stack, verticals, and churn metrics.',
     },
     {
         key: 'fda',
@@ -389,9 +397,55 @@ export function createSignalGridMcpServer(): Server {
                 },
             },
             {
+                name: 'extract_netsuite_b2b_leads_and_churn',
+                description:
+                    'Extract live Oracle NetSuite SuiteApp ERP B2B vendor leads, Built-for-NetSuite badges, SuiteScript/SuiteTalk integration stacks, supported countries & verticals, star histograms, and 1-3 star implementation churn reviews (signalgridhq/netsuite-suiteapp-directory-scraper).',
+                annotations: {
+                    title: 'Extract NetSuite SuiteApp ERP Vendor Leads & Churn Reviews',
+                    readOnlyHint: true,
+                    destructiveHint: false,
+                    idempotentHint: true,
+                    openWorldHint: true,
+                },
+                inputSchema: {
+                    type: 'object',
+                    additionalProperties: false,
+                    properties: {
+                        mode: {
+                            type: 'string',
+                            enum: ['apps', 'churn_reviews', 'apps_with_churn'],
+                            default: 'apps_with_churn',
+                            description:
+                                "Extraction mode: 'apps' for ERP vendor directory & stack metadata, 'churn_reviews' for 1-3 star reviews, or 'apps_with_churn' for both.",
+                        },
+                        searchQuery: {
+                            type: 'string',
+                            description: "Optional keyword filter (e.g. 'edi', 'wms', 'avalara', 'payments').",
+                        },
+                        categoryFilter: {
+                            type: 'string',
+                            description: "Optional SuiteApp category (e.g. 'Featured', 'Latest', 'Staff-Pick').",
+                        },
+                        appSlugs: {
+                            type: 'array',
+                            items: { type: 'string' },
+                            description:
+                                "Optional exact SuiteApp urlComponents (e.g. ['ShipBob', 'Versapay-for-NetSuite-SuitePayments']).",
+                        },
+                        maxItems: {
+                            type: 'integer',
+                            minimum: 1,
+                            maximum: 200,
+                            default: 15,
+                            description: 'Maximum dataset items to return in this MCP call (1-200).',
+                        },
+                    },
+                },
+            },
+            {
                 name: 'preview_sample_b2b_dataset',
                 description:
-                    'Read verified offline sample rows (up to 50 records) from the bundled Xero App Store, QuickBooks App Store, Zoho Marketplace, or US FDA Import Refusal datasets with zero API key required.',
+                    'Read verified offline sample rows (up to 50 records) from the bundled Xero App Store, QuickBooks App Store, Zoho Marketplace, NetSuite SuiteApp ERP, or US FDA Import Refusal datasets with zero API key required.',
                 annotations: {
                     title: 'Preview Offline B2B Sample Dataset (No API Key Needed)',
                     readOnlyHint: true,
@@ -406,9 +460,9 @@ export function createSignalGridMcpServer(): Server {
                     properties: {
                         dataset: {
                             type: 'string',
-                            enum: ['xero', 'quickbooks', 'zoho', 'fda'],
+                            enum: ['xero', 'quickbooks', 'zoho', 'netsuite', 'fda'],
                             description:
-                                "Which bundled B2B dataset to preview: 'xero', 'quickbooks', 'zoho', or 'fda'.",
+                                "Which bundled B2B dataset to preview: 'xero', 'quickbooks', 'zoho', 'netsuite', or 'fda'.",
                         },
                         limit: {
                             type: 'integer',
@@ -518,6 +572,26 @@ export function createSignalGridMcpServer(): Server {
                     payload.searchQuery = args.searchQuery.trim();
                 }
                 const items = await runApifyActor('zoho-marketplace-scraper', payload);
+                return {
+                    content: [{ type: 'text', text: JSON.stringify(items, null, 2) }],
+                };
+            }
+
+            if (name === 'extract_netsuite_b2b_leads_and_churn') {
+                const payload: Record<string, unknown> = {
+                    mode: typeof args.mode === 'string' ? args.mode : 'apps_with_churn',
+                    maxItems: clampMaxItems(args.maxItems, 15),
+                };
+                if (typeof args.searchQuery === 'string' && args.searchQuery.trim().length > 0) {
+                    payload.searchQuery = args.searchQuery.trim();
+                }
+                if (typeof args.categoryFilter === 'string' && args.categoryFilter.trim().length > 0) {
+                    payload.categoryFilter = args.categoryFilter.trim();
+                }
+                if (Array.isArray(args.appSlugs) && args.appSlugs.length > 0) {
+                    payload.appSlugs = args.appSlugs;
+                }
+                const items = await runApifyActor('netsuite-suiteapp-directory-scraper', payload);
                 return {
                     content: [{ type: 'text', text: JSON.stringify(items, null, 2) }],
                 };
