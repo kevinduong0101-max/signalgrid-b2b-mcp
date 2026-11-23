@@ -22,7 +22,7 @@ const __dirname = path.dirname(__filename);
 const SAMPLES_DIR = path.resolve(__dirname, '..', 'samples');
 
 interface SampleCatalogEntry {
-    key: 'xero' | 'quickbooks' | 'zoho' | 'netsuite' | 'fda';
+    key: 'xero' | 'quickbooks' | 'quickbooks-proadvisor' | 'zoho' | 'netsuite' | 'fda';
     uri: string;
     name: string;
     filename: string;
@@ -45,6 +45,14 @@ const SAMPLE_CATALOG: readonly SampleCatalogEntry[] = [
         filename: 'quickbooks-apps-sample-50.csv',
         description:
             '50 verified QuickBooks App Store vendor records with supportEmail, supportPhone, pricing plans, Intuit AQI badges, and churn signals.',
+    },
+    {
+        key: 'quickbooks-proadvisor',
+        uri: 'signalgrid://samples/quickbooks-proadvisor-50',
+        name: 'QuickBooks ProAdvisor CPA & Bookkeeper Directory Sample (50 rows)',
+        filename: 'quickbooks-proadvisor-sample-50.csv',
+        description:
+            '50 verified QuickBooks ProAdvisor CPA and bookkeeping firm records with websites, LinkedIn profiles, bio-extracted emails/phones, certifications, and client reviews.',
     },
     {
         key: 'zoho',
@@ -443,9 +451,65 @@ export function createSignalGridMcpServer(): Server {
                 },
             },
             {
+                name: 'extract_quickbooks_proadvisor_leads',
+                description:
+                    'Extract 100,000+ Intuit QuickBooks ProAdvisor CPAs, Enrolled Agents, and B2B bookkeeping firms across US, CA, UK, AU & IN—complete with firm websites, LinkedIn profiles, bio-extracted emails/phones, certifications, and client review ratings (signalgridhq/quickbooks-proadvisor-scraper).',
+                annotations: {
+                    title: 'Extract QuickBooks ProAdvisor CPA & Bookkeeper Leads',
+                    readOnlyHint: true,
+                    destructiveHint: false,
+                    idempotentHint: true,
+                    openWorldHint: true,
+                },
+                inputSchema: {
+                    type: 'object',
+                    additionalProperties: false,
+                    properties: {
+                        region: {
+                            type: 'string',
+                            enum: ['US', 'CA', 'GB', 'AU', 'IN'],
+                            default: 'US',
+                            description: 'QuickBooks ProAdvisor directory region.',
+                        },
+                        locations: {
+                            type: 'array',
+                            items: { type: 'string' },
+                            description:
+                                "Cities or ZIP/postal codes to query (e.g. ['New York, NY', 'Austin, TX', '94105']).",
+                        },
+                        radiusMiles: {
+                            type: 'integer',
+                            minimum: 5,
+                            maximum: 200,
+                            default: 50,
+                            description: 'Search radius in miles around each location.',
+                        },
+                        onlyCpaOrEa: {
+                            type: 'boolean',
+                            default: false,
+                            description: 'Keep only CPAs or Enrolled Agents (EAs).',
+                        },
+                        minReviews: {
+                            type: 'integer',
+                            minimum: 0,
+                            maximum: 1000,
+                            default: 0,
+                            description: 'Minimum number of verified client reviews.',
+                        },
+                        maxItems: {
+                            type: 'integer',
+                            minimum: 1,
+                            maximum: 200,
+                            default: 15,
+                            description: 'Maximum dataset items to return in this MCP call (1-200).',
+                        },
+                    },
+                },
+            },
+            {
                 name: 'preview_sample_b2b_dataset',
                 description:
-                    'Read verified offline sample rows (up to 50 records) from the bundled Xero App Store, QuickBooks App Store, Zoho Marketplace, NetSuite SuiteApp ERP, or US FDA Import Refusal datasets with zero API key required.',
+                    'Read verified offline sample rows (up to 50 records) from the bundled Xero App Store, QuickBooks App Store, QuickBooks ProAdvisor CPA Directory, Zoho Marketplace, NetSuite SuiteApp ERP, or US FDA Import Refusal datasets with zero API key required.',
                 annotations: {
                     title: 'Preview Offline B2B Sample Dataset (No API Key Needed)',
                     readOnlyHint: true,
@@ -460,9 +524,9 @@ export function createSignalGridMcpServer(): Server {
                     properties: {
                         dataset: {
                             type: 'string',
-                            enum: ['xero', 'quickbooks', 'zoho', 'netsuite', 'fda'],
+                            enum: ['xero', 'quickbooks', 'quickbooks-proadvisor', 'zoho', 'netsuite', 'fda'],
                             description:
-                                "Which bundled B2B dataset to preview: 'xero', 'quickbooks', 'zoho', 'netsuite', or 'fda'.",
+                                "Which bundled B2B dataset to preview: 'xero', 'quickbooks', 'quickbooks-proadvisor', 'zoho', 'netsuite', or 'fda'.",
                         },
                         limit: {
                             type: 'integer',
@@ -592,6 +656,23 @@ export function createSignalGridMcpServer(): Server {
                     payload.appSlugs = args.appSlugs;
                 }
                 const items = await runApifyActor('netsuite-suiteapp-directory-scraper', payload);
+                return {
+                    content: [{ type: 'text', text: JSON.stringify(items, null, 2) }],
+                };
+            }
+
+            if (name === 'extract_quickbooks_proadvisor_leads') {
+                const payload: Record<string, unknown> = {
+                    region: typeof args.region === 'string' ? args.region : 'US',
+                    radiusMiles: typeof args.radiusMiles === 'number' ? args.radiusMiles : 50,
+                    onlyCpaOrEa: Boolean(args.onlyCpaOrEa),
+                    minReviews: typeof args.minReviews === 'number' ? args.minReviews : 0,
+                    maxItems: clampMaxItems(args.maxItems, 15),
+                };
+                if (Array.isArray(args.locations) && args.locations.length > 0) {
+                    payload.locations = args.locations;
+                }
+                const items = await runApifyActor('quickbooks-proadvisor-scraper', payload);
                 return {
                     content: [{ type: 'text', text: JSON.stringify(items, null, 2) }],
                 };
