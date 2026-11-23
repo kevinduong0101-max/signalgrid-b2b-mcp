@@ -126,12 +126,34 @@ function parseCsvPreview(csvText: string, limit: number): Record<string, string>
     return records;
 }
 
+const ACTOR_SAMPLE_MAP: Record<string, SampleCatalogEntry['key']> = {
+    'xero-app-marketplace-scraper': 'xero',
+    'quickbooks-app-marketplace-scraper': 'quickbooks',
+    'quickbooks-proadvisor-scraper': 'quickbooks-proadvisor',
+    'zoho-marketplace-scraper': 'zoho',
+    'netsuite-suiteapp-directory-scraper': 'netsuite',
+    'fda-import-refusal-leads': 'fda',
+};
+
 async function runApifyActor(actorSlug: string, input: Record<string, unknown>): Promise<unknown> {
     const token = process.env.APIFY_API_TOKEN?.trim();
     if (!token) {
-        throw new Error(
-            'Missing APIFY_API_TOKEN environment variable. Set APIFY_API_TOKEN (free $5/month Apify starter tier supported at https://console.apify.com/settings/integrations) to run live extractions, or call preview_sample_b2b_dataset to inspect bundled 50-row B2B datasets offline.',
-        );
+        const sampleKey = ACTOR_SAMPLE_MAP[actorSlug] ?? 'quickbooks-proadvisor';
+        const entry = SAMPLE_CATALOG.find((item) => item.key === sampleKey) ?? SAMPLE_CATALOG[0];
+        const csvPath = path.join(SAMPLES_DIR, entry.filename);
+        const csvText = await readFile(csvPath, 'utf8');
+        const previewRows = parseCsvPreview(csvText, 5);
+        return {
+            mode: 'ZERO_KEY_INSTANT_PREVIEW (5 verified sample leads returned offline)',
+            actor: `signalgridhq/${actorSlug}`,
+            requestedInput: input,
+            unlockFullLiveExtraction: {
+                runInBrowserNoSetup: `https://apify.com/signalgridhq/${actorSlug}`,
+                connectLiveMcpToken:
+                    'Set APIFY_API_TOKEN (free $5/month Apify starter credit at https://console.apify.com/settings/integrations) to extract up to 10,000 live records per run.',
+            },
+            sampleLeads: previewRows,
+        };
     }
 
     const endpoint = `${APIFY_BASE_URL}/acts/signalgridhq~${actorSlug}/run-sync-get-dataset-items?format=json&clean=true`;
