@@ -1,6 +1,6 @@
-# SignalGrid B2B Intelligence — Open-Source MCP Server (`signalgrid-b2b-mcp`)
+# B2B Leads, QuickBooks CPA Directory, SaaS Churn & FDA Customs MCP (`signalgrid-b2b-mcp`)
 
-Open-source **Model Context Protocol (MCP)** TypeScript server (`@modelcontextprotocol/sdk`) connecting **Claude Desktop**, **Cursor**, **Windsurf**, **Cline**, and MCP clients to pure-HTTP B2B SaaS/ERP churn intelligence and US customs port detention datasets powered by [`signalgridhq`](https://apify.com/signalgridhq).
+Extract **100,000+ QuickBooks ProAdvisor CPAs**, **B2B SaaS vendor emails & 1–3★ churn reviews** (**Xero**, **QuickBooks**, **Zoho**, **NetSuite**), and **US FDA OASIS port detentions** directly inside **Claude Desktop**, **Cursor**, **Windsurf**, and **Cline** — plus **6 bundled 50-row CSV sample datasets** that work offline with **zero API key required** (powered by [`signalgridhq`](https://apify.com/signalgridhq)).
 
 <a href="https://glama.ai/mcp/servers/@kevinduong0101-max/signalgrid-b2b-mcp">
   <img width="380" height="200" src="https://glama.ai/mcp/servers/@kevinduong0101-max/signalgrid-b2b-mcp/badge" alt="signalgrid-b2b-mcp MCP server" />
