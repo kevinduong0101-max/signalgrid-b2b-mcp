@@ -8,6 +8,17 @@ Extract **100,000+ QuickBooks ProAdvisor CPAs**, **B2B SaaS vendor emails & 1–
 
 ---
 
+## Instant Full CSV Packs (No API Key or Setup Needed)
+
+Need a flat UTF-8 CSV today for **Clay**, **Instantly**, **Smartlead**, **Apollo**, or **Excel** without configuring MCP or API tokens? Preview the 100-row samples free in this repo or grab the full verified exports:
+
+| Verified Dataset | What's Inside | Free 100-Row Preview | Full CSV Download |
+| :--- | :--- | :---: | :---: |
+| **1,400+ US CPA & Accounting Firms (QuickBooks ProAdvisors)** | `1,403` deduplicated US firms across 30 metros · `425` direct office emails · `496` phones · `967` LinkedIn URLs · `1,177` websites | [`samples/us_cpa_firms_free_sample_100.csv`](./samples/us_cpa_firms_free_sample_100.csv) | [**Download Full CSV ($39)**](https://signalgridhq.gumroad.com/l/us-cpa-accounting-firms-csv) |
+| **Verified B2B SaaS Vendors & Partners Direct Contacts** | `244` commercial SaaS companies (Zoho CRM, Books & Desk) · **`100%` verified direct emails** · `241` phones · `242` street addresses | [`samples/b2b_saas_vendors_free_sample_100.csv`](./samples/b2b_saas_vendors_free_sample_100.csv) | [**Download Full CSV ($39)**](https://signalgridhq.gumroad.com/l/b2b-saas-vendors-direct-contacts-csv) |
+
+---
+
 ## Features & Included MCP Primitives
 
 ### Tools (`tools/list` — 7 Tools)
