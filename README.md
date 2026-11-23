@@ -8,14 +8,15 @@ Extract **100,000+ QuickBooks ProAdvisor CPAs**, **B2B SaaS vendor emails & 1–
 
 ---
 
-## Instant Full CSV Packs (No API Key or Setup Needed)
+## Ready-to-Send B2B Outbound Kits (100% DNS MX-Verified Emails + Custom Hooks)
 
-Need a flat UTF-8 CSV today for **Clay**, **Instantly**, **Smartlead**, **Apollo**, or **Excel** without configuring MCP or API tokens? Preview the 100-row samples free in this repo or grab the full verified exports:
+Need clean UTF-8 CSVs today for **Instantly**, **Smartlead**, **Clay**, **Apollo**, or **Excel** without configuring MCP or API tokens? Every single row in our primary V2 CSVs is **verified against live DNS `MX` mail servers (`0%` blank email rows)**, tagged with `Google Workspace` vs `Microsoft 365`, and pre-populated with a data-backed opening line:
 
-| Verified Dataset | What's Inside | Free 100-Row Preview | Full CSV Download |
+| Outbound Kit | What's Inside (100% MX-Verified, 0% Blank Emails) | Free Preview | Instant ZIP Download |
 | :--- | :--- | :---: | :---: |
-| **1,400+ US CPA & Accounting Firms (QuickBooks ProAdvisors)** | `1,403` deduplicated US firms across 30 metros · `425` direct office emails · `496` phones · `967` LinkedIn URLs · `1,177` websites | [`samples/us_cpa_firms_free_sample_100.csv`](./samples/us_cpa_firms_free_sample_100.csv) | [**Download Full CSV ($39)**](https://signalgridhq.gumroad.com/l/us-cpa-accounting-firms-csv) |
-| **Verified B2B SaaS Vendors & Partners Direct Contacts** | `244` commercial SaaS companies (Zoho CRM, Books & Desk) · **`100%` verified direct emails** · `241` phones · `242` street addresses | [`samples/b2b_saas_vendors_free_sample_100.csv`](./samples/b2b_saas_vendors_free_sample_100.csv) | [**Download Full CSV ($39)**](https://signalgridhq.gumroad.com/l/b2b-saas-vendors-direct-contacts-csv) |
+| **Free 125-Row Sample Pack (`$0`)** | `75` US CPA & tax firms + `50` B2B SaaS churn targets (`100%` MX-verified emails, inbox tags & custom first-line hooks) | [Download `$0` ZIP](https://signalgridhq.gumroad.com/l/free-b2b-cpa-saas-sample-csv) | [**Get Free Sample ($0)**](https://signalgridhq.gumroad.com/l/free-b2b-cpa-saas-sample-csv) |
+| **1,390+ US CPA & Accounting Firms Outbound Kit** | `1,392` US QuickBooks ProAdvisor firms (`100%` MX-verified emails, `644` named decision-makers, `Google` vs `M365` tags, custom icebreakers + `283` bonus phone/LI firms & 3 scripts) | [`samples/us_cpa_firms_free_sample_100.csv`](./samples/us_cpa_firms_free_sample_100.csv) | [**Download Full Kit ($29)**](https://signalgridhq.gumroad.com/l/us-cpa-accounting-firms-csv) |
+| **1,140+ B2B SaaS Vendors & 1–3★ Churn Targets Kit** | `1,143` commercial SaaS companies across QuickBooks, Xero, Zoho & NetSuite (`100%` MX-verified emails, `147` active 1–3★ churn hot-sheet targets, custom pitch hooks & 3 agency scripts) | [`samples/b2b_saas_vendors_free_sample_100.csv`](./samples/b2b_saas_vendors_free_sample_100.csv) | [**Download Full Kit ($29)**](https://signalgridhq.gumroad.com/l/b2b-saas-vendors-direct-contacts-csv) |
 
 ---
 
