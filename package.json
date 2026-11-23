@@ -1,7 +1,7 @@
 {
   "name": "signalgrid-b2b-mcp",
-  "version": "1.0.0",
-  "description": "Open-source Model Context Protocol (MCP) server for SignalGrid B2B Intelligence — extract Xero App Store churn, QuickBooks App Store vendor contacts & churn reviews, and US FDA OASIS port refusal leads.",
+  "version": "1.0.1",
+  "description": "Extract 100k+ QuickBooks ProAdvisor CPAs, B2B SaaS vendor emails & 1-3 star churn reviews (Xero, QuickBooks, Zoho, NetSuite), and US FDA port detentions via MCP. Includes 6 offline 50-row CSV samples.",
   "type": "module",
   "main": "./dist/index.js",
   "bin": {
@@ -21,12 +21,16 @@
     "mcp",
     "mcp-server",
     "model-context-protocol",
-    "apify",
     "b2b-leads",
-    "xero",
+    "lead-generation",
+    "cpa-directory",
     "quickbooks",
+    "xero",
+    "zoho",
+    "netsuite",
     "fda-import-refusals",
-    "churn-intelligence"
+    "churn-intelligence",
+    "apify"
   ],
   "author": "SignalGrid B2B Intelligence (https://apify.com/signalgridhq)",
   "license": "MIT",
